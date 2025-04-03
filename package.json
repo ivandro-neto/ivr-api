@@ -15,7 +15,12 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
+    "fs": "^0.0.1-security",
+    "google-tts-api": "^2.0.2",
+    "gtts": "^0.2.1",
     "mssql": "^11.0.1",
+    "node-fetch": "^3.3.2",
+    "play-sound": "^1.1.6",
     "sequelize": "^6.37.7",
     "sequelize-typescript": "^2.1.6",
     "tedious": "^18.6.1"

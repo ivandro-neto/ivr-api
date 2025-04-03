@@ -10,7 +10,7 @@ export const sequelize = new Sequelize({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  logging: false,
+  logging: true,
   dialectOptions: {
     options: {
       encrypt: true, // Habilitar SSL se necessário
@@ -25,8 +25,8 @@ export const connectDB = async () => {
     console.log("✅ Database connected successfully!");
   } catch (error) {
     console.error("❌ Database connection failed:", error);
-    process.exit(1);
+    throw new Error("❌ Database connection failed: " + error);
   }
 };
 
-sequelize.addModels([Customers]);
+//sequelize.addModels([Customers]);

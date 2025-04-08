@@ -59,11 +59,15 @@ export const getCustomerBalance = async (
       .split("")
       .join(" ")} é de ${customer?.account_balance} kwanzas.`;
 
+    const messageEN = `The balance of the customer with number ${number
+      .split("")
+      .join(" ")} is ${customer?.account_balance} kwanzas.`;
+
     // Gerando o áudio
     const filename = `balance_${number}_${Date.now()}`;
-    await generateAudio(message, `./public/audio/tmp/${filename}.mp3`);
+   // await generateAudio(message, `./public/audio/tmp/${filename}.mp3`);
 
-    ffmpeg(`./public/audio/tmp/${filename}.mp3`)
+   /*  ffmpeg(`./public/audio/tmp/${filename}.mp3`)
       .toFormat("wav")
       .audioFrequency(8000) // 8 kHz
       .audioChannels(1) // Mono
@@ -71,13 +75,13 @@ export const getCustomerBalance = async (
       .save(`./public/audio/${filename}.wav`)
       .on("end", () => {
         console.log(`Conversion complete: ${filename}.wav`);
-      });
+      }); */
     //@ts-ignore
     return res.status(200).json({
-      number,
-      balance: customer?.account_balance,
+      /*  number,
+      balance: customer?.account_balance, */
       message,
-      audio_url: `http://10.15.9.140:${process.env.API_PORT}/audio/${filename}.wav`,
+      /*  audio_url: `http://10.15.9.140:${process.env.API_PORT}/audio/${filename}.wav`, */
     });
   } catch (error) {
     next(error); // Passa o erro para o Express

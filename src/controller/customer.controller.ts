@@ -60,7 +60,7 @@ export const getActivePlan = async (
       return res.status(404).json({ error: "Plan not found" });
     }
 
-    const message = `O Plano activo é ${plan.name}.`;
+    const message = `O Plano activo é ${plan.name.trim()}.`;
 
     //@ts-ignore
     return res.status(200).json({
@@ -116,7 +116,7 @@ export const activePlan = async (
     customer.active_planId = planId;
     customer.account_balance -= plan.weight;
 
-    let message = `O ${plan.name} foi activado com sucesso.`;
+    let message = `O ${plan.name.trim()} foi activado com sucesso.`;
 
     //@ts-ignore
     return res.status(200).json({ message });
@@ -174,7 +174,7 @@ export const TransferCredits = async (
     customer.account_balance -= amount;
     destination.account_balance += amount;
 
-    let message = `Foi transferido ${amount} kwanzas para o usuario ${destination.account_name} com sucesso.`;
+    let message = `Foi transferido ${amount} kwanzas para o usuario ${destination.account_name.trim()} com sucesso.`;
 
     //@ts-ignore
     return res.status(200).json({ message });

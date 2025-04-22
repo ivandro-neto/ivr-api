@@ -55,9 +55,7 @@ export const getCustomerBalance = async (
       //@ts-ignore
       return res.status(404).json({ error: "account not found" });
     }
-    const message = `O saldo do cliente com número ${number
-      .split("")
-      .join(" ")} é de ${customer?.account_balance} kwanzas.`;
+    const message = `O seu saldo é de ${customer?.account_balance} kwanzas.`;
 
     const messageEN = `The balance of the customer with number ${number
       .split("")

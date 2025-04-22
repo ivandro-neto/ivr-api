@@ -90,24 +90,27 @@ const getCustomerBalance = (req, res, next) => __awaiter(void 0, void 0, void 0,
         const message = `O saldo do cliente com número ${number
             .split("")
             .join(" ")} é de ${customer === null || customer === void 0 ? void 0 : customer.account_balance} kwanzas.`;
+        const messageEN = `The balance of the customer with number ${number
+            .split("")
+            .join(" ")} is ${customer === null || customer === void 0 ? void 0 : customer.account_balance} kwanzas.`;
         // Gerando o áudio
         const filename = `balance_${number}_${Date.now()}`;
-        yield generateAudio(message, `./public/audio/tmp/${filename}.mp3`);
-        (0, fluent_ffmpeg_1.default)(`./public/audio/tmp/${filename}.mp3`)
-            .toFormat("wav")
-            .audioFrequency(8000) // 8 kHz
-            .audioChannels(1) // Mono
-            .audioBitrate("16k") // 16-bit equivalent
-            .save(`./public/audio/${filename}.wav`)
-            .on("end", () => {
-            console.log(`Conversion complete: ${filename}.wav`);
-        });
+        // await generateAudio(message, `./public/audio/tmp/${filename}.mp3`);
+        /*  ffmpeg(`./public/audio/tmp/${filename}.mp3`)
+           .toFormat("wav")
+           .audioFrequency(8000) // 8 kHz
+           .audioChannels(1) // Mono
+           .audioBitrate("16k") // 16-bit equivalent
+           .save(`./public/audio/${filename}.wav`)
+           .on("end", () => {
+             console.log(`Conversion complete: ${filename}.wav`);
+           }); */
         //@ts-ignore
         return res.status(200).json({
-            number,
-            balance: customer === null || customer === void 0 ? void 0 : customer.account_balance,
+            /*  number,
+            balance: customer?.account_balance, */
             message,
-            audio_url: `http://10.15.9.140:${process.env.API_PORT}/audio/${filename}.wav`,
+            /*  audio_url: `http://10.15.9.140:${process.env.API_PORT}/audio/${filename}.wav`, */
         });
     }
     catch (error) {

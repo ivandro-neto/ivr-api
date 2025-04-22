@@ -50,7 +50,7 @@ export const getActivePlan = async (
     const customer = await Customer.findOne({
       where: { account_number: number },
     });
-    const plan = await Plan.findByPk(customer?.active_planId);
+    const plan = await Plan.findOne({ where: { id: customer?.active_planId } });
     if (!customer) {
       //@ts-ignore
       return res.status(404).json({ error: "account not found" });
@@ -115,7 +115,7 @@ export const activePlan = async (
 
     customer.active_planId = planId;
     customer.account_balance -= plan.weight;
-
+    await customer.save();
     let message = `O ${plan.name.trim()} foi activado com sucesso.`;
 
     //@ts-ignore
@@ -173,7 +173,8 @@ export const TransferCredits = async (
 
     customer.account_balance -= amount;
     destination.account_balance += amount;
-
+    await customer.save();
+    await destination.save();
     let message = `Foi transferido ${amount} kwanzas para o usuario ${destination.account_name.trim()} com sucesso.`;
 
     //@ts-ignore

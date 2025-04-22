@@ -1,38 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
-import fetch from "node-fetch";
-import fs from "fs";
-import * as googleTTS from "google-tts-api"; // Certifique-se de importar corretamente
 import Customer from "../model/customer.model";
-import { sequelize } from "../config/db";
-import { QueryTypes } from "sequelize";
-import ffmpeg from "fluent-ffmpeg";
-import ffmpegPath from "@ffmpeg-installer/ffmpeg";
-
-ffmpeg.setFfmpegPath(ffmpegPath.path);
-
-const generateAudio = async (text: string, filePath: string) => {
-  try {
-    console.log("googleTTS:", googleTTS); // Verificar se o módulo está carregado
-
-    const url = googleTTS.getAudioUrl(text, {
-      lang: "pt-PT",
-      slow: false,
-      host: "https://translate.google.com",
-    });
-
-    console.log("URL gerada:", url);
-
-    const response = await fetch(url);
-    const buffer = await response.arrayBuffer();
-    fs.writeFileSync(filePath, Buffer.from(buffer));
-
-    console.log("Áudio gerado:", filePath);
-    return filePath;
-  } catch (error) {
-    console.error("Erro ao gerar áudio:", error);
-    return null;
-  }
-};
+import Plan from "../model/plan.model";
+import { error } from "console";
 
 export const getCustomerBalance = async (
   req: Request,
@@ -48,7 +17,7 @@ export const getCustomerBalance = async (
     }
 
     const customer = await Customer.findOne({
-      where: { phone_number: number },
+      where: { account_number: number },
     });
 
     if (customer == null) {
@@ -57,31 +26,159 @@ export const getCustomerBalance = async (
     }
     const message = `O seu saldo é de ${customer?.account_balance} kwanzas.`;
 
-    const messageEN = `The balance of the customer with number ${number
-      .split("")
-      .join(" ")} is ${customer?.account_balance} kwanzas.`;
-
-    // Gerando o áudio
-    const filename = `balance_${number}_${Date.now()}`;
-   // await generateAudio(message, `./public/audio/tmp/${filename}.mp3`);
-
-   /*  ffmpeg(`./public/audio/tmp/${filename}.mp3`)
-      .toFormat("wav")
-      .audioFrequency(8000) // 8 kHz
-      .audioChannels(1) // Mono
-      .audioBitrate("16k") // 16-bit equivalent
-      .save(`./public/audio/${filename}.wav`)
-      .on("end", () => {
-        console.log(`Conversion complete: ${filename}.wav`);
-      }); */
     //@ts-ignore
     return res.status(200).json({
-      /*  number,
-      balance: customer?.account_balance, */
       message,
-      /*  audio_url: `http://10.15.9.140:${process.env.API_PORT}/audio/${filename}.wav`, */
     });
   } catch (error) {
-    next(error); // Passa o erro para o Express
+    next(error);
+  }
+};
+export const getActivePlan = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { number } = req.body;
+
+    if (!number) {
+      //@ts-ignore
+      return res.status(400).json({ error: "Number is required" });
+    }
+
+    const customer = await Customer.findOne({
+      where: { account_number: number },
+    });
+    const plan = await Plan.findByPk(customer?.active_planId);
+    if (!customer) {
+      //@ts-ignore
+      return res.status(404).json({ error: "account not found" });
+    }
+    if (!plan) {
+      //@ts-ignore
+      return res.status(404).json({ error: "Plan not found" });
+    }
+
+    const message = `O Plano activo é ${plan.name}.`;
+
+    //@ts-ignore
+    return res.status(200).json({
+      message,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const activePlan = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { number, planId } = req.body;
+
+    if (!number) {
+      //@ts-ignore
+      return res.status(400).json({ error: "Number is required" });
+    }
+    if (!planId) {
+      //@ts-ignore
+      return res.status(400).json({ error: "Plan id is required" });
+    }
+
+    const customer = await Customer.findOne({
+      where: { account_number: number },
+    });
+    const plan = await Plan.findOne({
+      where: { id: planId },
+    });
+
+    if (!customer) {
+      //@ts-ignore
+      return res.status(404).json({ error: "account not found" });
+    }
+    if (!plan) {
+      //@ts-ignore
+      return res.status(404).json({ error: "Plan not found." });
+    }
+
+    if (customer.account_balance < plan.weight) {
+      let message =
+        "Infelizmente não possui saldo suficiente na sua conta para ativar este plano.";
+      //@ts-ignore
+      return res.status(400).json({
+        message,
+      });
+    }
+
+    customer.active_planId = planId;
+    customer.account_balance -= plan.weight;
+
+    let message = `O ${plan.name} foi activado com sucesso.`;
+
+    //@ts-ignore
+    return res.status(200).json({ message });
+  } catch (err) {
+    next(err);
+  }
+};
+export const TransferCredits = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { number, to, amount } = req.body;
+
+    if (!number) {
+      //@ts-ignore
+      return res.status(400).json({ error: "Number is required" });
+    }
+    if (!to) {
+      //@ts-ignore
+      return res.status(400).json({ error: "destination number is required" });
+    }
+    if (!amount) {
+      //@ts-ignore
+      return res.status(400).json({ error: "amount is required" });
+    }
+
+    const customer = await Customer.findOne({
+      where: { account_number: number },
+    });
+    const destination = await Customer.findOne({
+      where: { account_number: to },
+    });
+
+    if (!customer) {
+      //@ts-ignore
+      return res.status(404).json({ error: "account not found" });
+    }
+
+    if (!destination) {
+      //@ts-ignore
+      return res.status(404).json({ error: "account not found" });
+    }
+
+    if (customer.account_balance < amount) {
+      let message =
+        "Infelizmente não possui saldo suficiente na sua conta para realizar esta transferência.";
+      //@ts-ignore
+      return res.status(400).json({
+        message,
+      });
+    }
+
+    customer.account_balance -= amount;
+    destination.account_balance += amount;
+
+    let message = `Foi transferido ${amount} kwanzas para o usuario ${destination.account_name} com sucesso.`;
+
+    //@ts-ignore
+    return res.status(200).json({ message });
+  } catch (err) {
+    next(err);
   }
 };

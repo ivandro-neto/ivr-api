@@ -1,7 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import Customer from "../model/customer.model";
 import Plan from "../model/plan.model";
-import { error } from "console";
 
 export const getCustomerBalance = async (
   req: Request,
@@ -10,7 +9,7 @@ export const getCustomerBalance = async (
 ): Promise<void> => {
   try {
     const { number } = req.body;
-
+    let message = "";
     if (!number) {
       //@ts-ignore
       return res.status(400).json({ error: "Number is required" });
@@ -21,10 +20,9 @@ export const getCustomerBalance = async (
     });
 
     if (customer == null) {
-      //@ts-ignore
-      return res.status(404).json({ error: "account not found" });
+      message = "Não foi possível encontrar o cliente.";
     }
-    const message = `O seu saldo é de ${customer?.account_balance} kwanzas.`;
+    message = `O seu saldo é de ${customer?.account_balance} kwanzas.`;
 
     //@ts-ignore
     return res.status(200).json({
@@ -41,7 +39,7 @@ export const getActivePlan = async (
 ): Promise<void> => {
   try {
     const { number } = req.body;
-
+    let message = "";
     if (!number) {
       //@ts-ignore
       return res.status(400).json({ error: "Number is required" });
@@ -52,15 +50,13 @@ export const getActivePlan = async (
     });
     const plan = await Plan.findOne({ where: { id: customer?.active_planId } });
     if (!customer) {
-      //@ts-ignore
-      return res.status(404).json({ error: "account not found" });
+      message = "Não foi possível encontrar o cliente.";
     }
     if (!plan) {
-      //@ts-ignore
-      return res.status(404).json({ error: "Plan not found" });
+      message = "Não foi possível encontrar o plano.";
     }
 
-    const message = `O Plano activo é ${plan.name.trim()}.`;
+    message = `O Plano activo é ${plan?.name.trim()}.`;
 
     //@ts-ignore
     return res.status(200).json({
@@ -78,7 +74,7 @@ export const activePlan = async (
 ): Promise<void> => {
   try {
     const { number, planId } = req.body;
-
+    let message = "";
     if (!number) {
       //@ts-ignore
       return res.status(400).json({ error: "Number is required" });
@@ -96,27 +92,24 @@ export const activePlan = async (
     });
 
     if (!customer) {
-      //@ts-ignore
-      return res.status(404).json({ error: "account not found" });
+      message = "Não foi possível encontrar o cliente.";
     }
     if (!plan) {
-      //@ts-ignore
-      return res.status(404).json({ error: "Plan not found." });
+      message = "Não foi possível encontrar o plano.";
     }
 
-    if (customer.account_balance < plan.weight) {
-      let message =
-        "Infelizmente não possui saldo suficiente na sua conta para ativar este plano.";
+    if (customer!.account_balance < plan!.weight) {
+      message = "Infelizmente não possui saldo suficiente na sua conta para ativar este plano.";
       //@ts-ignore
       return res.status(400).json({
         message,
       });
     }
 
-    customer.active_planId = planId;
-    customer.account_balance -= plan.weight;
-    await customer.save();
-    let message = `O ${plan.name.trim()} foi activado com sucesso.`;
+    customer!.active_planId = planId;
+    customer!.account_balance -= plan!.weight;
+    await customer!.save();
+    message = `O ${plan!.name.trim()} foi activado com sucesso.`;
 
     //@ts-ignore
     return res.status(200).json({ message });
@@ -131,7 +124,7 @@ export const TransferCredits = async (
 ): Promise<void> => {
   try {
     const { number, to, amount } = req.body;
-
+    let message = "";
     if (!number) {
       //@ts-ignore
       return res.status(400).json({ error: "Number is required" });
@@ -153,17 +146,15 @@ export const TransferCredits = async (
     });
 
     if (!customer) {
-      //@ts-ignore
-      return res.status(404).json({ error: "account not found" });
+      message = "Não foi possível encontrar o cliente.";
     }
 
     if (!destination) {
-      //@ts-ignore
-      return res.status(404).json({ error: "account not found" });
+      message = "Não foi possível encontrar o cliente de destino.";
     }
 
-    if (customer.account_balance < amount) {
-      let message =
+    if (customer!.account_balance < amount) {
+      message =
         "Infelizmente não possui saldo suficiente na sua conta para realizar esta transferência.";
       //@ts-ignore
       return res.status(400).json({
@@ -171,11 +162,11 @@ export const TransferCredits = async (
       });
     }
 
-    customer.account_balance -= amount;
-    destination.account_balance += amount;
-    await customer.save();
-    await destination.save();
-    let message = `Foi transferido ${amount} kwanzas para o usuario ${destination.account_name.trim()} com sucesso.`;
+    customer!.account_balance -= amount;
+    destination!.account_balance += amount;
+    await customer!.save();
+    await destination!.save();
+    message = `Foi transferido ${amount} kwanzas para o usuario ${destination!.account_name.trim()} com sucesso.`;
 
     //@ts-ignore
     return res.status(200).json({ message });

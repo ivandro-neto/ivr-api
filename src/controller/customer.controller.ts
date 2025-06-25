@@ -73,7 +73,7 @@ export const AddCredits = async (
 ): Promise<void> => {
   try {
     const { number, amount } = req.body;
-
+    let message = "";
     if (!number) {
       //@ts-ignore
       return res.status(400).json({ error: "Number is required" });
@@ -88,14 +88,12 @@ export const AddCredits = async (
     });
 
     if (!customer) {
-      //@ts-ignore
-      return res.status(404).json({ error: "account not found" });
+      message = "Não foi possível encontrar o cliente.";
     }
+    customer!.account_balance += amount;
+    await customer!.save();
 
-    customer.account_balance += amount;
-    customer.save();
-
-    const message = `Foi adicionado ${amount} Kwanzas no seu saldo actual.`;
+    message = `Foi adicionado ${amount} Kwanzas no seu saldo actual.`;
 
     //@ts-ignore
     return res.status(200).json({
@@ -138,7 +136,8 @@ export const activePlan = async (
     }
 
     if (customer!.account_balance < plan!.weight) {
-      message = "Infelizmente não possui saldo suficiente na sua conta para ativar este plano.";
+      message =
+        "Infelizmente não possui saldo suficiente na sua conta para ativar este plano.";
       //@ts-ignore
       return res.status(400).json({
         message,

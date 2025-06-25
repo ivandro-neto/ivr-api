@@ -6,7 +6,7 @@ import { error } from "console";
 export const getCustomerBalance = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { number } = req.body;
@@ -37,7 +37,7 @@ export const getCustomerBalance = async (
 export const getActivePlan = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { number } = req.body;
@@ -70,11 +70,50 @@ export const getActivePlan = async (
     next(error);
   }
 };
+export const AddCredits = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { number, amount } = req.body;
+
+    if (!number) {
+      //@ts-ignore
+      return res.status(400).json({ error: "Number is required" });
+    }
+    if (!amount) {
+      //@ts-ignore
+      return res.status(400).json({ error: "Amount is required" });
+    }
+
+    const customer = await Customer.findOne({
+      where: { account_number: number },
+    });
+
+    if (!customer) {
+      //@ts-ignore
+      return res.status(404).json({ error: "account not found" });
+    }
+
+    customer.account_balance += amount;
+    customer.save();
+
+    const message = `Foi adicionado ${amount} Kwanzas no seu saldo actual.`;
+
+    //@ts-ignore
+    return res.status(200).json({
+      message,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const activePlan = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { number, planId } = req.body;
@@ -127,7 +166,7 @@ export const activePlan = async (
 export const TransferCredits = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { number, to, amount } = req.body;

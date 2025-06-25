@@ -8,7 +8,7 @@ export const getCustomerBalance = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { number } = req.body;
+    const { number } = req.query;
     let message = "";
     if (!number) {
       //@ts-ignore
@@ -38,7 +38,7 @@ export const getActivePlan = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { number } = req.body;
+    const { number } = req.query;
     let message = "";
     if (!number) {
       //@ts-ignore
@@ -72,7 +72,7 @@ export const AddCredits = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { number, amount } = req.body;
+    const { number, amount } = req.query;
     let message = "";
     if (!number) {
       //@ts-ignore
@@ -90,7 +90,7 @@ export const AddCredits = async (
     if (!customer) {
       message = "Não foi possível encontrar o cliente.";
     }
-    customer!.account_balance += amount;
+    customer!.account_balance += Number(amount);
     await customer!.save();
 
     message = `Foi adicionado ${amount} Kwanzas no seu saldo actual.`;
@@ -110,7 +110,7 @@ export const activePlan = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { number, planId } = req.body;
+    const { number, planId } = req.query;
     let message = "";
     if (!number) {
       //@ts-ignore
@@ -144,7 +144,7 @@ export const activePlan = async (
       });
     }
 
-    customer!.active_planId = planId;
+    customer!.active_planId = Number(planId);
     customer!.account_balance -= plan!.weight;
     await customer!.save();
     message = `O ${plan!.name.trim()} foi activado com sucesso.`;
@@ -161,7 +161,7 @@ export const TransferCredits = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { number, to, amount } = req.body;
+    const { number, to, amount } = req.query;
     let message = "";
     if (!number) {
       //@ts-ignore
@@ -191,7 +191,7 @@ export const TransferCredits = async (
       message = "Não foi possível encontrar o cliente de destino.";
     }
 
-    if (customer!.account_balance < amount) {
+    if (customer!.account_balance < Number(amount)) {
       message =
         "Infelizmente não possui saldo suficiente na sua conta para realizar esta transferência.";
       //@ts-ignore
@@ -200,8 +200,8 @@ export const TransferCredits = async (
       });
     }
 
-    customer!.account_balance -= amount;
-    destination!.account_balance += amount;
+    customer!.account_balance -= Number(amount);
+    destination!.account_balance += Number(amount);
     await customer!.save();
     await destination!.save();
     message = `Foi transferido ${amount} kwanzas para o usuario ${destination!.account_name.trim()} com sucesso.`;

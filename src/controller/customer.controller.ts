@@ -21,6 +21,10 @@ export const getCustomerBalance = async (
 
     if (customer == null) {
       message = "Não foi possível encontrar o cliente.";
+      //@ts-ignore
+      return res.status(400).json({
+        message,
+      });
     }
     message = `O seu saldo é de ${customer?.account_balance} kwanzas.`;
 
@@ -51,9 +55,17 @@ export const getActivePlan = async (
     const plan = await Plan.findOne({ where: { id: customer?.active_planId } });
     if (!customer) {
       message = "Não foi possível encontrar o cliente.";
+      //@ts-ignore
+      return res.status(400).json({
+        message,
+      });
     }
     if (!plan) {
       message = "Não foi possível encontrar o plano.";
+      //@ts-ignore
+      return res.status(400).json({
+        message,
+      });
     }
 
     message = `O Plano activo é ${plan?.name.trim()}.`;
@@ -89,6 +101,10 @@ export const AddCredits = async (
 
     if (!customer) {
       message = "Não foi possível encontrar o cliente.";
+      //@ts-ignore
+      return res.status(400).json({
+        message,
+      });
     }
     customer!.account_balance += Number(amount);
     await customer!.save();
@@ -130,9 +146,17 @@ export const activePlan = async (
 
     if (!customer) {
       message = "Não foi possível encontrar o cliente.";
+      //@ts-ignore
+      return res.status(400).json({
+        message,
+      });
     }
     if (!plan) {
       message = "Não foi possível encontrar o plano.";
+      //@ts-ignore
+      return res.status(400).json({
+        message,
+      });
     }
 
     if (customer!.account_balance < plan!.weight) {
@@ -185,10 +209,18 @@ export const TransferCredits = async (
 
     if (!customer) {
       message = "Não foi possível encontrar o cliente.";
+      //@ts-ignore
+      return res.status(400).json({
+        message,
+      });
     }
 
     if (!destination) {
       message = "Não foi possível encontrar o cliente de destino.";
+      //@ts-ignore
+      return res.status(400).json({
+        message,
+      });
     }
 
     if (customer!.account_balance < Number(amount)) {

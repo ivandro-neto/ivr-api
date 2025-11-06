@@ -135,7 +135,7 @@ export const getCustomerInfo = async (
     }
 
     const customer = await Customer.findOne({
-      where: { phone_number: number },
+      where: { account_number: number },
     });
 
     if (customer == null) {

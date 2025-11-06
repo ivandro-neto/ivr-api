@@ -15,6 +15,7 @@ export const sequelize = new Sequelize({
     options: {
       encrypt: true, // Habilitar SSL se necessário
       trustServerCertificate: true, // Para conexões locais
+       requestTimeout: 60000,
     },
   },
 });

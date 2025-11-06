@@ -6,7 +6,7 @@ export class Customer extends Model {
   public account_number!: string;
   public account_name!: string;
   public account_balance!: number;
-  public account_gender! : "M" | "F";
+  public account_gender!: "M" | "F";
   public active_planId!: number;
   public operator_Id!: number;
 }
@@ -31,19 +31,27 @@ Customer.init(
       allowNull: false,
     },
     account_gender: {
-      type: DataTypes.ENUM,
-      values: ["M", "F"],
+      type: DataTypes.STRING(1),
+      validate: {
+        isIn: [["M", "F"]], // ✅ Correct way to enforce allowed values
+      },
       allowNull: false,
     },
     active_planId: {
       type: DataTypes.INTEGER,
-      references: "plans",
-      allowNull : true
+      references: {
+        model: "plans",
+        key: "id",
+      },
+      allowNull: true,
     },
     operator_Id: {
       type: DataTypes.INTEGER,
-      references: "operators",
-      allowNull : false
+      references: {
+        model: "operators",
+        key: "id",
+      },
+      allowNull: false,
     },
   },
   {

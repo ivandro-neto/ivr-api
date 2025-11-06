@@ -15,7 +15,7 @@ export const getCustomerBalance = async (
       //@ts-ignore
       return res.status(400).json({ error: "Number is required" });
     }
-
+    console.log("number", number)
     const customer = await Customer.findOne({
       where: { account_number: number },
     });
@@ -34,6 +34,7 @@ export const getCustomerBalance = async (
       message,
     });
   } catch (error) {
+    console.error(error);
     next(error);
   }
 };
@@ -159,20 +160,18 @@ export const getCustomerInfo = async (
       customer.account_gender === "M" ? "Sr." : "Sra."
     } ${customer.account_name}. ${
       manager.operator_gender === "M" ? "O" : "A"
-    } ${
-      manager.operator_gender === "M" ? "seu" : "sua"
-    } operador${
-      manager.operator_gender === "M" ? "o" : "a"
-    }, ${
-      manager.operator_gender === "M" ? "Sr." : "Sra."
-    } ${manager.operator_name}, já vai atender. Por favor, aguarde um momento.`;
+    } ${manager.operator_gender === "M" ? "seu" : "sua"} operador${
+      manager.operator_gender === "M" ? "" : "a"
+    }, ${manager.operator_gender === "M" ? "Sr." : "Sra."} ${
+      manager.operator_name
+    }, já vai atender. Por favor, aguarde um momento.`;
 
     //@ts-ignore
     return res.status(200).json({
       message,
-      client_name : customer.account_name,
-      operator_name : manager.operator_name,
-      operator_extension : manager.operator_extension
+      client_name: customer.account_name,
+      operator_name: manager.operator_name,
+      operator_extension: manager.operator_extension,
     });
   } catch (error) {
     next(error);

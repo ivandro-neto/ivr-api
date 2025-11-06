@@ -4,7 +4,7 @@ import { sequelize } from "../config/db"; // Certifique-se de importar a conexã
 export class Operator extends Model {
   public id!: number;
   public operator_name!: string;
-  public operator_gender! : "M" | "F";
+  public operator_gender!: "M" | "F";
   public operator_extension!: number;
 }
 
@@ -12,7 +12,7 @@ Operator.init(
   {
     id: {
       type: DataTypes.INTEGER,
-      autoIncrement : true,
+      autoIncrement: true,
       primaryKey: true,
     },
     operator_name: {
@@ -20,14 +20,15 @@ Operator.init(
       allowNull: false,
     },
     operator_gender: {
-      type: DataTypes.ENUM,
-      values: ["M", "F"],
+      type: DataTypes.STRING(1),
+      validate: {
+        isIn: [["M", "F"]], // ✅ Correct way to enforce allowed values
+      },
       allowNull: false,
     },
     operator_extension: {
       type: DataTypes.BIGINT,
       allowNull: false,
-      
     },
   },
   {

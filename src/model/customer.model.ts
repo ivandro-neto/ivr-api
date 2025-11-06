@@ -6,7 +6,9 @@ export class Customer extends Model {
   public account_number!: string;
   public account_name!: string;
   public account_balance!: number;
+  public account_gender! : "M" | "F";
   public active_planId!: number;
+  public operator_Id!: number;
 }
 
 Customer.init(
@@ -28,10 +30,20 @@ Customer.init(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+    account_gender: {
+      type: DataTypes.ENUM,
+      values: ["M", "F"],
+      allowNull: false,
+    },
     active_planId: {
       type: DataTypes.INTEGER,
       references: "plans",
       allowNull : true
+    },
+    operator_Id: {
+      type: DataTypes.INTEGER,
+      references: "operators",
+      allowNull : false
     },
   },
   {

@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import Customer from "../model/customer.model";
 import Plan from "../model/plan.model";
+import Operator from "../model/operator.model";
 
 export const getCustomerBalance = async (
   req: Request,
@@ -114,6 +115,64 @@ export const AddCredits = async (
     //@ts-ignore
     return res.status(200).json({
       message,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCustomerInfo = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { number } = req.query;
+    let message = "";
+    if (!number) {
+      //@ts-ignore
+      return res.status(400).json({ error: "Number is required" });
+    }
+
+    const customer = await Customer.findOne({
+      where: { phone_number: number },
+    });
+
+    if (customer == null) {
+      message = "Não foi possível encontrar o cliente.";
+      //@ts-ignore
+      return res.status(400).json({
+        message,
+      });
+    }
+    const manager = await Operator.findOne({
+      where: { id: customer.operator_Id },
+    });
+    if (manager == null) {
+      message = "Não foi possível encontrar o gestor do cliente.";
+      //@ts-ignore
+      return res.status(400).json({
+        message,
+      });
+    }
+    message = `Seja bem-vindo a yucol Angola, ${
+      customer.account_gender === "M" ? "Sr." : "Sra."
+    } ${customer.account_name}. ${
+      manager.operator_gender === "M" ? "O" : "A"
+    } ${
+      manager.operator_gender === "M" ? "seu" : "sua"
+    } operador${
+      manager.operator_gender === "M" ? "o" : "a"
+    }, ${
+      manager.operator_gender === "M" ? "Sr." : "Sra."
+    } ${manager.operator_name}, já vai atender. Por favor, aguarde um momento.`;
+
+    //@ts-ignore
+    return res.status(200).json({
+      message,
+      client_name : customer.account_name,
+      operator_name : manager.operator_name,
+      operator_extension : manager.operator_extension
     });
   } catch (error) {
     next(error);

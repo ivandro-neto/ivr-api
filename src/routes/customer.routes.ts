@@ -4,6 +4,7 @@ import {
   AddCredits,
   getActivePlan,
   getCustomerBalance,
+  getCustomerInfo,
   TransferCredits,
 } from "../controller/customer.controller";
 
@@ -14,5 +15,6 @@ customerRouter.post("/ivr/plan", getActivePlan);
 customerRouter.post("/ivr/plan/active", activePlan);
 customerRouter.post("/ivr/send", TransferCredits);
 customerRouter.post("/ivr/balance/add", AddCredits);
+customerRouter.post("/ivr/info", getCustomerInfo);
 
 export default customerRouter;

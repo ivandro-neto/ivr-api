@@ -28,6 +28,7 @@ exports.sequelize = new sequelize_typescript_1.Sequelize({
         options: {
             encrypt: true, // Habilitar SSL se necessário
             trustServerCertificate: true, // Para conexões locais
+            requestTimeout: 60000,
         },
     },
 });

@@ -12,16 +12,39 @@ Customer.init({
         autoIncrement: true,
         primaryKey: true,
     },
-    phone_number: {
+    account_number: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
-    customer_name: {
+    account_name: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
     account_balance: {
         type: sequelize_1.DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+    },
+    account_gender: {
+        type: sequelize_1.DataTypes.STRING(1),
+        validate: {
+            isIn: [["M", "F"]], // ✅ Correct way to enforce allowed values
+        },
+        allowNull: false,
+    },
+    active_planId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        references: {
+            model: "plans",
+            key: "id",
+        },
+        allowNull: true,
+    },
+    operator_Id: {
+        type: sequelize_1.DataTypes.INTEGER,
+        references: {
+            model: "operators",
+            key: "id",
+        },
         allowNull: false,
     },
 }, {

@@ -156,7 +156,7 @@ export const getCustomerInfo = async (
         message,
       });
     }
-    message = `Seja bem-vindo a yucol Angola, ${
+    message = `Seja bem-vindo, ${
       customer.account_gender === "M" ? "Sr." : "Sra."
     } ${customer.account_name}. ${
       manager.operator_gender === "M" ? "O" : "A"

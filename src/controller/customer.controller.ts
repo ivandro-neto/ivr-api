@@ -156,11 +156,9 @@ export const getCustomerInfo = async (
         message,
       });
     }
-    message = `Seja bem-vindo, ${
-      customer.account_gender === "M" ? "Sr." : "Sra."
-    } ${customer.account_name}. ${
+    message = `${
       manager.operator_gender === "M" ? "O" : "A"
-    } ${manager.operator_gender === "M" ? "seu" : "sua"} operador${
+    } ${manager.operator_gender === "M" ? "seu" : "sua"} gestor${
       manager.operator_gender === "M" ? "" : "a"
     }, ${manager.operator_gender === "M" ? "Sr." : "Sra."} ${
       manager.operator_name

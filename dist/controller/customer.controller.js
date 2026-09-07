@@ -147,7 +147,7 @@ const getCustomerInfo = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
                 message,
             });
         }
-        message = `Seja bem-vindo, ${customer.account_gender === "M" ? "Sr." : "Sra."} ${customer.account_name}. ${manager.operator_gender === "M" ? "O" : "A"} ${manager.operator_gender === "M" ? "seu" : "sua"} operador${manager.operator_gender === "M" ? "" : "a"}, ${manager.operator_gender === "M" ? "Sr." : "Sra."} ${manager.operator_name}, já vai atender. Por favor, aguarde um momento.`;
+        message = `${manager.operator_gender === "M" ? "O" : "A"} ${manager.operator_gender === "M" ? "seu" : "sua"} gestor${manager.operator_gender === "M" ? "" : "a"}, ${manager.operator_gender === "M" ? "Sr." : "Sra."} ${manager.operator_name}, já vai atender. Por favor, aguarde um momento.`;
         //@ts-ignore
         return res.status(200).json({
             message,
